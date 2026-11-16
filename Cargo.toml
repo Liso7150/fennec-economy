@@ -1,0 +1,16 @@
+[package]
+name = "fennec-economy"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/Liso7150/fennec-economy"
+description = "Agent context economy: head/tail elision, duplicate references, character budget, token-saving mods."
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+fennec-pyjson = { path = "../fennec-core/src/fennec-pyjson" }
+
+[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
