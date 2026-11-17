@@ -137,7 +137,11 @@ pub fn compact(messages: &[Value], options: &Options, seen: &mut HashMap<String,
                 }
                 
                 let mut hasher = Sha256::new();
-                hasher.update(optimized.as_bytes());
+                // The digest is of the raw result, as in `fennec_core.context.compact`.
+                // Summarising first would collapse two different tool results that
+                // happen to compress to the same text, and the second would be dropped
+                // as "identical to" a call it has nothing to do with.
+                hasher.update(text.as_bytes());
                 let digest = format!("{:x}", hasher.finalize());
                 let label = copy
                     .get("tool_call_id")
@@ -148,7 +152,7 @@ pub fn compact(messages: &[Value], options: &Options, seen: &mut HashMap<String,
                 if let Some(first) = seen.get(&digest) {
                     let replaced = format!(
                         "[identical to the result of {first}; {} chars not repeated]",
-                        optimized.chars().count()
+                        text.chars().count()
                     );
                     set_content(&mut copy, &replaced);
                     deduped += 1;

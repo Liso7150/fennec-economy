@@ -209,3 +209,49 @@ fn no_false_positives_on_normal_tool_results() {
     let (_, stats) = compact(&messages, &options, &mut HashMap::new());
     assert_eq!(stats.token_savings, 0, "normal tool results should not trigger mods");
 }
+
+#[test]
+fn results_that_summarise_alike_stay_distinct() {
+    // The file mod keeps the head and tail lines and drops the middle, so these two
+    // reads compress to the same text while being different results. Deduplicating on
+    // the summarised text would report the second as "identical to" a file it is not.
+    let shared_head: Vec<String> = (1..=6).map(|n| format!("{n:4}\tshared line {n}")).collect();
+    let shared_tail: Vec<String> = (17..=20).map(|n| format!("{n:4}\tshared tail {n}")).collect();
+    let build = |body: &str| -> String {
+        let mut lines = shared_head.clone();
+        lines.extend((7..=16).map(|n| format!("{n:4}\t{body} {n}")));
+        lines.extend(shared_tail.clone());
+        lines.join("\n")
+    };
+    let (alpha, beta) = (build("alpha"), build("beta"));
+    assert_ne!(alpha, beta, "the two results differ in the elided middle");
+    assert_eq!(apply_token_savings(&alpha, 5000).0, apply_token_savings(&beta, 5000).0,
+        "and the premise of the test is that they summarise to one text");
+    let messages = vec![
+        json!({"role": "tool", "tool_call_id": "call_alpha", "content": alpha}),
+        json!({"role": "tool", "tool_call_id": "call_beta", "content": beta}),
+    ];
+    let (payload, stats) = compact(&messages, &Options::sized(10000, 5000), &mut HashMap::new());
+    assert_eq!(stats.deduped, 0, "different results are not repeats of each other");
+    assert_eq!(stats.files_summarized, 2);
+    for index in 1..=2 {
+        let text = payload[index - 1]["content"].as_str().unwrap();
+        assert!(!text.starts_with("[identical to"), "{text}");
+    }
+}
+
+#[test]
+fn a_repeated_result_is_still_recognised_after_the_mod() {
+    let content = (1..=40).map(|n| format!("{n:4}\tfn body() {{ {n} }}")).collect::<Vec<_>>().join("\n");
+    let messages = vec![
+        json!({"role": "tool", "tool_call_id": "call_1", "content": content.clone()}),
+        json!({"role": "tool", "tool_call_id": "call_2", "content": content.clone()}),
+    ];
+    let (payload, stats) = compact(&messages, &Options::sized(10000, 5000), &mut HashMap::new());
+    assert_eq!(stats.deduped, 1, "the second identical read is a repeat");
+    let label = payload[1]["content"].as_str().unwrap();
+    assert!(label.starts_with("[identical to the result of call_1; "), "{label}");
+    // The count is of the raw result, as in context.py; summarising first would quote
+    // the length of the summary rather than the bytes the caller stopped resending.
+    assert!(label.contains(&format!("{} chars", content.chars().count())), "{label}");
+}
