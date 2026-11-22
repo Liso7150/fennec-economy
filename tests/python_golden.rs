@@ -1,4 +1,4 @@
-//! Byte-for-byte agreement with `fennec_core/context.py`, against the goldens in
+//! Byte-for-byte agreement with fennec-core's `context.py`, against the goldens in
 //! `goldens/` (produced by `benchmarks/make_goldens.py` in fennec-core).
 
 use fennec_economy::{compact, elide, size, Options, Stats};

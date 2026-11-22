@@ -1,5 +1,5 @@
-//! Context economy for the agent loop - the Rust port of
-//! `fennec_core/context.py`. Prefill dominates a turn on the Fennec engine, so
+//! Context economy for the agent loop - the Rust port of fennec-core's
+//! `context.py`. Prefill dominates a turn on the Fennec engine, so
 //! every character the loop re-sends each step costs real seconds. The UI keeps
 //! the full transcript; only the payload sent to the model is compacted:
 //! head/tail elision per result, duplicate results replaced by a reference, and
@@ -137,7 +137,7 @@ pub fn compact(messages: &[Value], options: &Options, seen: &mut HashMap<String,
                 }
                 
                 let mut hasher = Sha256::new();
-                // The digest is of the raw result, as in `fennec_core.context.compact`.
+                // The digest is of the raw result, as in fennec-core's context.compact.
                 // Summarising first would collapse two different tool results that
                 // happen to compress to the same text, and the second would be dropped
                 // as "identical to" a call it has nothing to do with.

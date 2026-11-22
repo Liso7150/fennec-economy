@@ -24,7 +24,7 @@ Depends on `fennec-pyjson` (path dependency to `../fennec-core/src/fennec-pyjson
 
 ## Tests
 
-Golden tests in `tests/python_golden.rs` verify byte-for-byte agreement with the Python fallback in `fennec-core/fennec_core/context.py`. The goldens live in `goldens/` (copied from `fennec-core/src/goldens/`).
+Golden tests in `tests/python_golden.rs` verify byte-for-byte agreement with the Python fallback in `fennec-core/context.py`. The goldens live in `goldens/` (copied from `fennec-core/src/goldens/`).
 
 ```
 cargo test
