@@ -2,7 +2,7 @@
 
 Agent context economy for the Fennec suite. Compacts the transcript sent to the model so prefill stays cheap.
 
-Working version **1.0.0**; nothing at 1.0.0 is published yet — the newest published product release is `v0.9.0`.
+Working version **1.0.0**. This repository has no prior published release or tag; nothing at 1.0.0 is published yet.
 
 ## What it does
 
