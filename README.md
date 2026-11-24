@@ -2,6 +2,8 @@
 
 Agent context economy for the Fennec suite. Compacts the transcript sent to the model so prefill stays cheap.
 
+Working version **1.0.0**; nothing at 1.0.0 is published yet — the newest published product release is `v0.9.0`.
+
 ## What it does
 
 - **Head/tail elision** — long tool results keep their beginning and end, with a marker for the removed middle
@@ -26,8 +28,10 @@ Depends on `fennec-pyjson` (path dependency to `../fennec-core/src/fennec-pyjson
 
 Golden tests in `tests/python_golden.rs` verify byte-for-byte agreement with the Python fallback in `fennec-core/context.py`. The goldens live in `goldens/` (copied from `fennec-core/src/goldens/`).
 
+31 tests across 2 files — 6 golden checks in `tests/python_golden.rs` plus 25 token-saving-mod checks in `tests/token_saving_mods.rs`, measured by the hub lane.
+
 ```
-cargo test
+cargo test --offline
 ```
 
 ## Used by
